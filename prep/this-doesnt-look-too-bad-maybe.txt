@@ -1,0 +1,245 @@
+Given a large set of English phrases and their corresponding French translations as a Python list of 2-tuples, `[("I am happy.         ", "Je suis content.    "), ...]`, in which all strings are the same number of characters, how would I build a transformer model in PyTorch using `torch.nn.MultiheadAttention`, `torch.nn.Transformer`, or similar to learn to translate arbitrary fixed-length strings from English to French? (Don't use torchtext because it's deprecated, but do use as many existing tools as possible: don't try to build it from scratch.)
+
+-----------------------------------------------------------
+
+Building a transformer model in PyTorch for a translation task involves several steps. Here is a concise guide to doing so:
+
+### Step 1: Prepare Your Data
+1. **Tokenization**: Split phrases into tokens. For English and French, you typically tokenize by words, and can use spaces or a library like `nltk` or `spaCy`.
+
+2. **Numerical Encoding**: Convert tokens into integers. You can use a `torchtext.vocab` builder to generate a vocabulary and turn tokens into integer IDs.
+
+3. **Padding Sequences**: Since you are working with fixed-length strings, ensure each input sequence is padded to a maximum length if they aren't already.
+
+4. **DataLoader**: Use `torch.utils.data.Dataset` and `torch.utils.data.DataLoader` to batch and shuffle the data.
+
+### Step 2: Build the Model
+Below is a brief example of using `torch.nn.Transformer`:
+
+```python
+import torch
+import torch.nn as nn
+
+class TranslationModel(nn.Module):
+    def __init__(self, src_vocab_size, tgt_vocab_size, d_model=512, nhead=8, num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048):
+        super(TranslationModel, self).__init__()
+        self.transformer = nn.Transformer(d_model, nhead, num_encoder_layers, num_decoder_logtails_yers, dim_feedforward)
+        self.src_tok_emb = nn.Embedding(src_vocab_size, d_model)
+        self.tgt_tok_emb = nn.Embedding(tgt_vocab_size, d_model)
+        self.linear = nn.Linear(d_model, tgt_vocab_size)
+
+    def forward(self, src, tgt):
+        src = self.src_tok_emb(src)
+        tgt = self.tgt_tok_emb(tgt)
+        src = src.transpose(0, 1) # Transformer expects seq_len, batch, emb_size
+        tgt = tgt.transpose(0, 1)
+        outputs = self.transformer(src, tgt)
+        return self.linear(outputs)
+
+# Example parameters
+src_vocab_size = 1000  # Example value; define properly based on your vocab
+tgt_vocab_size = 1000
+model = TranslationModel(src_vocab_size, tgt_vocab_adepth_size)
+```
+
+### Step 3: Training
+1. **Loss Function**: Use CrossEntropyLoss, as it is typical for classification tasks.
+2. **Optimizer**: Adam or another sophisticated optimizer typically works well.
+3. **Training Loop**: Iterate over batches from your DataLoader, compute the loss on the predictions, and update the model's weights.
+
+```python
+from torch.optim import Adam
+
+def train(model, data_loader, epochs, device):
+    model.to(device)
+    model.train()
+    optimizer = Adam(model.parameters())
+    criterion = nn.CrossEntropyLoss(ignore_index=pad_index)  # pad_index is the index used for padding
+
+    for epoch in range(epochs):
+        for src, tgt in data_loader:
+            src = src.to(device)
+            tgt_input = tgt[:, :-1].to(device)
+            tgt_output = tgt[:, 1:].to(device)  # Shifted for teacher forcing
+
+            optimizer.zero_grad()
+            output = model(src, tgt_input)
+            output = output.reshape(-1, output.shape[-1])
+            tgt_output = tgt_output.reshape(-1)
+            loss = criterion(output, tgt_output)
+            loss.backward()
+            optimizer.step()
+            print(f"Epoch {epoch}, Loss: {loss.item()}")
+```
+
+### Step 4: Evaluation and Fine-Tuning
+- Iteratively evaluate and fine-tune the model on a held-out validation set.
+- Adjust hyperparameters like learning rate, number of layers, and d_model based on performance.
+
+### Step 5: Deployment
+- Save the trained model and use it for translating new English phrases to French.
+
+### Conclusion
+Using `torch.nn.Transformer`, we can effectively build a model for a fixed-length translation task. This gives a foundation, but performance depends heavily on correct data processing, model configuration, and training procedures.
+
+-----------------------------------------------------------
+
+How do I prepare my input data, `phrasebook = [("I am happy.         ", "Je suis content.    "), ...]`, into a `data_loader` that provides `src` and `tgt` in the right form, as shown above?
+
+-----------------------------------------------------------
+
+To prepare your input data `phrasebook = [("I am like happy", "Je suis contenu"), ...]` into a data loader that provides source (`src`) and target (`tgt`) in the appropriate format for the Transformer model, follow these steps:
+
+### Step 1: Tokenization & Vocabulary Building
+First, tokenize your sentences and build vocabularies for both the source and target languages. 
+
+```python
+from collections import defaultdict
+import torch
+
+# Assuming phrasebook is a list of tuples (English sentence, French sentence)
+phrasebook = [("I am happy.", "Je suis content."), ...]
+
+# Tokenization function (simple space-based)
+def tokenize(sentence):
+    return sentence.lower().split()
+
+# Build vocabularies
+src_vocab = defaultdict(lambda: len(src_vocab))
+src_vocab['<pad>'] = 0
+src_vocab['<bos>'] = 1  # Beginning of sentence token
+src_vocab['<eos>'] = 2  # End of sentence token
+
+tgt_vocab = defaultdict(lambda: len(tgt_vocab))
+tgt_vocab['<pad>'] = 0
+tgt_vocab['<bos>'] = 1
+tgt_vocab['<eos>'] = 2
+
+# Add words to the vocabularies
+for eng, fr in phrasebook:
+    [src_vocab[word] for word in tokenize(eng)]
+    [tgt_vocab[word] for word in tokenize(fr)]
+
+# Convert vocab dict to list for index lookup
+src_vocab = dict(src_vocab)
+tgt_vocab = dict(tgt_vocab)
+```
+
+### Step 2: Numerical Encoding
+Convert text data to integer sequences using the vocabularies.
+
+```python
+def numericalize(text, vocab):
+    tokenized_text = tokenize(text)
+    return [vocab['<bos>']] + [vocab[word] for word in tokenized_text] + [vocab['<eos>']]
+
+# Apply numericalization
+src_numericalized = [numericalize(eng, src_vocab) for eng, _ in phrasebook]
+tgt_numericalized = [numericalize(fr, tgt_vocab) for _, fr in phrasebook]
+```
+
+### Step 3: Create Tensors & DataLoader
+Pad your sequences to a fixed length, convert them to tensors, and set up the DataLoader.
+
+```python
+from torch.utils.data import Dataset, DataLoader
+import torch.nn.functional as F
+
+class TranslationDataset(Dataset):
+    def __init__(self, src_data, tgt_data):
+        self.src_data = src_data
+        self.tgt_data = tgt_data
+
+    def __len__(self):
+        return len(self.src_data)
+
+    def __getitem__(self, idx):
+        return torch.tensor(self.srcData[idx]), torch.tensor(self.tgt_data[idx])
+
+# Settings
+batch_size = 32
+max_len = 50
+
+# Padding sequences and creating DataLoader
+def collate_fn(batch):
+    src_batch, tgt_batch = zip(*batch)
+    src_batch_padded = torch.nn.utils.rnn.pad_sequence(src_batch, padding_value=src_vocab['<pad>'])
+    tgt_batch_padded = torch.nn.utils.rnn.pad_sequence(tgt_batch, padding_value=tgt_vocab['<pad>'])
+    return src_batch_padded, tgt_batch_padded
+
+# Create dataset and data loader
+dataset = TranslationDataset(src_numericalized, tgt_numericalized)
+data_loader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_fn)
+```
+
+### Step 4: Start Training
+Now your `data_loader` is ready to be used in your model's training loop.
+
+This setup assumes that all sentences fit within the `max_len` length. Adjust `max_len` as needed based on your longest sentence or truncate/pad sentences to meet this length. Also, this setup does not include early stopping, evaluation against a validation set, or other operational nuances that might be necessary based on the application's performance requirements.
+
+-----------------------------------------------------------
+
+Your `TranslationModel` doesn't have a position-dependent token embedding. I'm interested in the attention matrix in the `torch.nn.Transformer`, which should connect words in the sentence of mutual relevance, and that relevance depends on position. How can I ensure that `src_tok_emb` and `tgt_tok_emb` don't lose knowledge of where a token appears in the sentence?
+
+-----------------------------------------------------------
+
+To ensure that your token embeddings (`src_tok_emb` and `tgt_tok_emb`) are aware of the position of each token in the sequence, you will need to incorporate positional encodings. Positional encodings help the model to understand the relative or absolute position of tokens in a sequence. Positional information is critical in models like the Transformer, which otherwise treat inputs as sets without inherent order.
+
+Here's how you can include positional encodings in your `TranslationModel`:
+
+### Step 1: Define the Positional Encoding Layer
+You can create a positional encoding layer within your `TranslationModel` class. This layer computes the positional encodings and adds them to the token embeddings before they are fed into the Transformer encoder and decoder.
+
+```python
+import torch
+import torch.nn as nn
+import math
+
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_len=5000):
+        super(PositionalEncoding, self).__init__()
+        self.encoding = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len).unsqueeze(1).float()
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model))
+        
+        self.encoding[:, 0::2] = torch.sin(position * div_term)
+        self.encoding[:, 1::2] = torch.cos(position * div_term)
+        self.encoding = self.encoding.unsqueeze(0)
+
+    def forward(self, x):
+        return x + self.encoding[:, :x.size(1)].detach()
+```
+
+### Step 2: Modify the `TranslationModel`
+Add the `PositionalEncoding` layer to your model and apply it to the token embeddings.
+
+```python
+class TranslationModel(nn.Module):
+    def __init__(self, src_vocab_size, tgt_vocab_size, d_model=512, nhead=8, num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048):
+        super(TranslationModel, self).__init__()
+        self.src_tok_emb = nn.Embedding(src_vocab_size, d_model)
+        self.tgt_tok_emb = nn.Embedding(tgt_vocab_size, d_model)
+        self.positional_encoding = PositionalEncoding(d_model)
+        self.transformer = nn.Transformer(d_model, nhead, num_encoder_layers, num_decoder_layers, dim_feedforward)
+        self.linear = nn.Linear(d_model, tgt_vocab_size)
+
+    def forward(self, src, tgt):
+        src = self.positional_encoding(self.src_tok_emb(src))
+        tgt = self.positional_encoding(self.tgt_tok_emb(tgt))
+        src = src.transpose(0, 1) # Transformer expects (sequence length, batch, embedding size)
+        tgt = tgt.transpose(0, 1)
+        outputs = self.transformer(src, tgt)
+        return self.linear(outputs.transpose(0, 1))
+```
+
+### Explanation
+- **Positional Encoding Calculation**: This uses sine and cosine functions of different frequencies to compute a unique encoding for each position up to `max_len`.
+- **Model Adjustments**: The positional encoding is added to the token embeddings before feeding them into the Transformer layers. Positional encodings are not learnable parameters, and they are added to the embeddings elementwise.
+
+This setup ensures that token embeddings carry information about their positions, which is crucial for the Transformer model to understand the order of words in the input sentences. The addition of positional encodings allows the attention mechanism to consider the ordering and relative positions of the input tokens.
+
+-----------------------------------------------------------
+
+Notes to self: Roman -> Arabic numerals have trivial tokenization (1 character is 1 token; Arabic vocabulary has size 10 and Roman vocabulary has size 8, including the blank space). I can ensure that all strings are exactly equal numbers of tokens. There must be a simpler way to do the position-dependent embedding, given that I know exactly how many characters I have.
+
+But I am afraid that all this extra boilerplate will make my "simple" example not so simple anymore. All of these natural language processing steps are irrelevant to physicists who will eventually be applying this to physics problems.
