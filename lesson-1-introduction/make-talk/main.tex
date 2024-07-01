@@ -109,7 +109,7 @@ Write an algorithm that generates output that depends on a huge number of intern
 \uncover<3->{Then use the trained algorithm on new problems.}
 
 \vspace{0.5 cm}
-\uncover<4->{\textcolor{darkblue}{If this sounds like fitting a function to data, you're right.}}
+\uncover<4->{\textcolor{darkblue}{If this sounds like a simple curve fit to data, you're right.}}
 \end{frame}
 
 \begin{frame}{Goals of this mini-course}
@@ -203,7 +203,7 @@ Detectors make unlabeled event displays.
 \uncover<2->{Once labeled, events can be processed in bulk.}
 
 \vspace{0.5 cm}
-\uncover<3->{Capacity for discovery scales with the number of events.}
+\uncover<3->{Capacity for discovery scales with the number of labeled events.}
 
 \column{0.4\linewidth}
 \uncover<3->{\includegraphics[height=7.5 cm]{img/scaleup.png}}
@@ -218,8 +218,100 @@ Detectors make unlabeled event displays.
 \end{columns}
 \end{frame}
 
+\begin{frame}{\mbox{ }}
+\vspace{0.5 cm}
+\Large
 
+Until recently, most HEP pattern-recognition consisted of hand-written heuristics (some still is).
 
+\vspace{1 cm}
+\uncover<2->{The history of Artificial Intelligence (AI) is also split between what we would now call hand-written algorithms and learned algorithms.}
+\end{frame}
+
+\begin{frame}{Symbolic AI versus Connectionist AI}
+\vspace{-0.7 cm}
+
+\begin{columns}[t]
+\column{0.5\linewidth}
+\begin{center}
+\Large Symbolic
+
+\vspace{0.25 cm}
+\includegraphics[width=0.8\linewidth]{img/craftsmanship.jpg}
+
+\normalsize
+\vspace{0.25 cm}
+\begin{itemize}
+\item Symbol manipulation and logic
+\item Searches through problem-space
+\item Hand-written common-sense rules
+\end{itemize}
+
+Examples: parsing, theorem-proving, chess-playing, expert systems
+\end{center}
+
+\column{0.5\linewidth}
+\begin{center}
+\Large Connectionist
+
+\vspace{0.25 cm}
+\includegraphics[width=0.8\linewidth]{img/farming.jpg}
+
+\normalsize
+\vspace{0.25 cm}
+\begin{itemize}
+\item Stimulus correlated to response only by strengths of internal connections
+\item No \underline{\it explicit} symbols or rules
+\item \underline{\it Effective} symbols/rules may arise
+\end{itemize}
+
+Examples: neural networks
+\end{center}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Connectionism started early}
+\small
+\vspace{0.2 cm}
+\begin{columns}
+\column{0.4\linewidth}
+\includegraphics[width=\linewidth]{img/330-PSA-80-60_\(USN_710739\)_\(20897323365\).jpg}
+
+\vspace{0.2 cm}
+Theory: Pitts \& McCullock (1943).
+
+\vspace{0.2 cm}
+Rosenblatt's perceptron machine (1958) attempted to recognize images of letters by adjusting free parameters with motors.
+
+\vspace{0.2 cm}
+\mbox{Made extravagant claims; reality hit hard.\hspace{-1 cm}}
+
+\column{0.6\linewidth}
+\includegraphics[width=\linewidth]{img/Organization_of_a_biological_brain_and_a_perceptron.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The ups and downs of AI: \only<1>{as mentioned in books}\only<2>{according to Henry Kautz}}
+\vspace{0.2 cm}
+\begin{columns}
+\column{1.1\linewidth}
+\only<1>{\includegraphics[width=\linewidth]{img/ups-and-downs-of-ai.png}}\only<2>{\includegraphics[width=\linewidth]{img/ups-and-downs-of-ai-overlay.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The ups and downs of AI: in conference attendance}
+\vspace{0.5 cm}
+\begin{columns}
+\column{1.1\linewidth}
+\includegraphics[width=\linewidth]{img/AI-conference-attendance.pdf}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The ups and downs of AI: according to physicists at CHEP}
+\vspace{0.25 cm}
+\includegraphics[width=\linewidth]{img/chep-papers-ml.pdf}
+\end{frame}
 
 
 
