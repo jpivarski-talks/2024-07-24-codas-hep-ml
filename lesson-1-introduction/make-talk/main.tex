@@ -109,7 +109,7 @@ Write an algorithm that generates output that depends on a huge number of intern
 \uncover<3->{Then use the trained algorithm on new problems.}
 
 \vspace{0.5 cm}
-\uncover<4->{\textcolor{darkblue}{If this sounds like a simple curve fit to data, you're right.}}
+\uncover<4->{\textcolor{darkblue}{If this sounds like fitting data with a function, you're right.}}
 \end{frame}
 
 \begin{frame}{Goals of this mini-course}
@@ -530,6 +530,14 @@ f[ a_{5,1}x_1 + a_{5,2}x_2 + \ldots a_{5,10}x_{10} + b_5 ] \\
 \end{frame}
 
 \begin{frame}{Neural networks take inspiration from neurons in the brain}
+\vspace{0.15 cm}
+\begin{columns}
+\column{1.2\linewidth}
+\includegraphics[width=\linewidth]{img/nerve-cells-sem-steve-gschmeissner.jpg}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Neural networks take inspiration from neurons in the brain}
 \vspace{0.16 cm}
 \begin{columns}
 \column{1.1\linewidth}
@@ -547,16 +555,30 @@ To do the same thing with our model, take the output of one ``activation + linea
 \end{columns}
 
 \vspace{1 cm}
-\uncover<5>{Without the non-linear activation functions, we'd lose this structure: linear transformations of linear transformations would collapse down to a single linear transformation.}
+\uncover<5>{Without the activation functions, we'd lose the structure: linear transformations of linear transformations collapse down to a single linear transformation.}
 
 \end{frame}
 
 \begin{frame}{It's usually drawn like this}
 \vspace{0.25 cm}
-\includegraphics[width=\linewidth]{img/artificial-neural-network-layers.pdf}
+\only<1>{\includegraphics[width=\linewidth]{img/artificial-neural-network-layers.pdf}}\only<2>{\includegraphics[width=\linewidth]{img/artificial-neural-network-layers-2.pdf}}
 
 \vspace{0.25 cm}
 The lines indicate that every output from one layer is included in the linear transformation of the next layer. (``There's an $a_{i\mbox{,\,}j}$ for every $x_j$ and $y_i$.'')
+\end{frame}
+
+\begin{frame}{\mbox{ }}
+\begin{center}
+\LARGE
+But\ldots why does that work?
+
+\vspace{1 cm}
+What's so special about this linear-nonlinear sandwich?
+
+\vspace{1 cm}
+\large
+\uncover<2->{\textcolor{darkblue}{(Time to switch to Jupyter.)}}
+\end{center}
 \end{frame}
 
 \end{document}
