@@ -197,13 +197,13 @@ Madeleine (n\'ee Goldstein) Isenberg, UCLA class of '65
 \only<1>{\includegraphics[height=7.5 cm]{img/bubble-chamber-photo-0.pdf}}\only<2->{\includegraphics[height=7.5 cm]{img/bubble-chamber-photo.pdf}}
 
 \column{0.2\linewidth}
-Detectors make unlabeled event displays.
+Detectors make uninterpreted event displays.
 
 \vspace{0.5 cm}
-\uncover<2->{Once labeled, events can be processed in bulk.}
+\uncover<2->{Raw signals must be interpreted as particles.}
 
 \vspace{0.5 cm}
-\uncover<3->{Capacity for discovery scales with the number of labeled events.}
+\uncover<3->{Capacity for discovery scales with the number of interpreted events.}
 
 \column{0.4\linewidth}
 \uncover<3->{\includegraphics[height=7.5 cm]{img/scaleup.png}}
@@ -313,7 +313,7 @@ Rosenblatt's perceptron machine (1958) attempted to recognize images of letters 
 \includegraphics[width=\linewidth]{img/chep-papers-ml.pdf}
 \end{frame}
 
-\begin{frame}{Machine learning techniques that are not neural networks}
+\begin{frame}{Machine learning techniques that are not neural networks:}
 \vspace{0.5 cm}
 \large
 
@@ -343,6 +343,220 @@ In this mini-course, we'll only cover neural networks.
 \vspace{1 cm}
 \uncover<2->{(There's enough to talk about.)}
 \end{center}
+\end{frame}
+
+\begin{frame}{\mbox{ }}
+\begin{center}
+\LARGE
+The rest of this PDF talk: \textcolor{darkblue}{what is a neural network?}
+
+\vspace{1 cm}
+Switch to Jupyter: \textcolor{darkblue}{why does a neural network work?}
+\end{center}
+\end{frame}
+
+\begin{frame}{\only<1-4>{Simplest neural network is a linear fit}\only<5>{Next-simplest passes it through a non-linear function $f$}}
+\vspace{0.25 cm}
+\begin{onlyenv}<1>
+\begin{center}
+\includegraphics[width=0.4\linewidth]{img/equation-for-a-line.pdf}
+\end{center}
+\vspace{-1.5 cm}
+\end{onlyenv}\begin{onlyenv}<2>
+\begin{center}
+\includegraphics[width=0.4\linewidth]{img/equation-for-a-plane.pdf}
+\end{center}
+\vspace{-1.75 cm}
+\end{onlyenv}
+
+\begin{columns}
+\column{1.1\linewidth}
+\renewcommand{\arraystretch}{1.5}
+\scriptsize
+\[ \uncover<5->{f \left[} \mbox{\hspace{0.25 cm}} \underbrace{\uncover<2->{\left(} \begin{array}{c c c c}
+\only<2->{\uncover<4->{a_{1,1}} & \uncover<4->{a_{1,2}} & \uncover<4->{\ldots} & \uncover<4->{a_{1,10}} \\}
+\only<2->{\uncover<4->{a_{2,1}} & \uncover<4->{a_{2,2}} & \uncover<4->{\ldots} & \uncover<4->{a_{2,10}} \\}
+\only<2->{\only<2-3>{a_1}\only<4->{a_{3,1}} & \only<2-3>{a_2}\only<4->{a_{3,2}} & \uncover<3->{\ldots} & \uncover<3->{\only<1-3>{a_{10}}}\only<4->{a_{3,10}} \\}
+\only<2->{\uncover<4->{a_{4,1}} & \uncover<4->{a_{4,2}} & \uncover<4->{\ldots} & \uncover<4->{a_{4,10}} \\}
+\only<2->{\uncover<4->{a_{5,1}} & \uncover<4->{a_{5,2}} & \uncover<4->{\ldots} & \uncover<4->{a_{5,10}} \\}
+\end{array}\only<1>{\mbox{\hspace{0.5 cm}}a\mbox{\hspace{0.5 cm}}} \vphantom{\vbox to 1.5cm{}} \uncover<2->{\right)}}_{\text{free parameters in the fit}} \cdot \underbrace{\uncover<2->{\left(} \only<1>{x}\begin{array}{c}
+\only<2->{\uncover<2->{x_1} \\}
+\only<2->{\uncover<2->{x_2} \\}
+\only<2->{\uncover<3->{\vdots} \\}
+\only<2->{\uncover<3->{x_{10}} \\}
+\end{array} \vphantom{\vbox to 1.5cm{}} \uncover<2->{\right)}}_{\text{input values}} + \underbrace{\uncover<4->{\left(} \begin{array}{c}
+\uncover<4->{b_1} \\
+\uncover<4->{b_2} \\
+\only<1-3>{b}\only<4->{b_3} \\
+\uncover<4->{b_4} \\
+\uncover<4->{b_5} \\
+\end{array} \vphantom{\vbox to 1.5cm{}} \uncover<4->{\right)}}_{\text{free parameters}} \mbox{\hspace{0.25 cm}} \uncover<5->{\right]} = \underbrace{\uncover<4->{\left(} \begin{array}{c}
+\uncover<4->{y_1} \\
+\uncover<4->{y_2} \\
+\only<1-3>{y}\only<4->{y_3} \\
+\uncover<4->{y_4} \\
+\uncover<4->{y_5} \\
+\end{array} \vphantom{\vbox to 1.5cm{}} \uncover<4->{\right)}}_{\text{output values}} = \begin{array}{c}
+\uncover<5->{f[} \uncover<4->{a_{1,1}x_1 + a_{1,2}x_2 + \ldots a_{1,10}x_{10} + b_1} \uncover<5->{]} \\
+\uncover<5->{f[} \uncover<4->{a_{2,1}x_1 + a_{2,2}x_2 + \ldots a_{2,10}x_{10} + b_2} \uncover<5->{]} \\
+\uncover<5->{f[} \only<1>{ax + b}\only<2-3>{a_{1}x_1 + a_{2}x_2 \uncover<3->{+ \ldots a_{10}x_{10}} + b}\only<4->{a_{3,1}x_1 + a_{3,2}x_2 + \ldots a_{3,10}x_{10} + b_3} \uncover<5->{]} \\
+\uncover<5->{f[} \uncover<4->{a_{4,1}x_1 + a_{4,2}x_2 + \ldots a_{4,10}x_{10} + b_4} \uncover<5->{]} \\
+\uncover<5->{f[} \uncover<4->{a_{5,1}x_1 + a_{5,2}x_2 + \ldots a_{5,10}x_{10} + b_5} \uncover<5->{]} \\
+\end{array} \]
+\end{columns}
+\end{frame}
+
+\begin{frame}{The non-linear function $f$ is called an ``activation function''}
+\small
+\vspace{0.5cm}
+\begin{columns}
+\column{0.2\linewidth}
+\includegraphics[width=\linewidth]{img/Activation_binary_step.pdf}
+
+\column{0.25\linewidth}
+binary step
+
+\vspace{-\baselineskip}
+\[ f(x) = \left\{ \begin{array}{c l}
+0 & \text{if } x < 0 \\
+1 & \text{if } x \ge 0 \\
+\end{array} \right. \]
+
+\column{0.2\linewidth}
+\includegraphics[width=\linewidth]{img/Activation_rectified_linear.pdf}
+
+\column{0.3\linewidth}
+rectified linear unit (ReLU)
+
+\vspace{-\baselineskip}
+\[ f(x) = \left\{ \begin{array}{c l}
+0 & \text{if } x < 0 \\
+x & \text{if } x \ge 0 \\
+\end{array} \right. \]
+\end{columns}
+
+\vspace{0.5cm}
+\begin{columns}
+\column{0.2\linewidth}
+\includegraphics[width=\linewidth]{img/Activation_logistic.pdf}
+
+\column{0.25\linewidth}
+logistic (soft step)
+
+\vspace{-\baselineskip}
+\[ f(x) = \frac{1}{1 + e^{-x}} \]
+
+\column{0.2\linewidth}
+\includegraphics[width=\linewidth]{img/Activation_prelu.pdf}
+
+
+\column{0.3\linewidth}
+``leaky'' ReLU
+
+\vspace{-\baselineskip}
+\[ f(x) = \left\{ \begin{array}{c l}
+\alpha x & \text{if } x < 0 \\
+x & \text{if } x \ge 0 \\
+\end{array} \right. \]
+\end{columns}
+
+\vspace{0.5cm}
+\begin{columns}
+\column{0.2\linewidth}
+\includegraphics[width=\linewidth]{img/Activation_tanh.pdf}
+
+\column{0.25\linewidth}
+hyperbolic tangent
+
+\vspace{-\baselineskip}
+\[ f(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}} \]
+
+\column{0.2\linewidth}
+\includegraphics[width=\linewidth]{img/Activation_swish.pdf}
+
+\column{0.3\linewidth}
+sigmoid linear unit (``swish'')
+
+\[ f(x) = \frac{x}{1 + e^{-x}} \]
+\end{columns}
+
+\large
+
+\vspace{0.75 cm}
+There are many choices, but ReLU is the simplest and most common.
+\end{frame}
+
+\begin{frame}{Neural networks take inspiration from neurons in the brain}
+\begin{center}
+\includegraphics[width=0.9\linewidth]{img/real-neuron.pdf}
+\end{center}
+
+\vspace{-1cm}
+\begin{columns}
+\column{1.1\linewidth}
+\renewcommand{\arraystretch}{1.5}
+\scriptsize
+\[ f \left[ \mbox{\hspace{0.25 cm}} \underbrace{\left( \begin{array}{c c c c}
+a_{1,1} & a_{1,2} & \ldots & a_{1,10} \\
+a_{2,1} & a_{2,2} & \ldots & a_{2,10} \\
+a_{3,1} & a_{3,2} & \ldots & a_{3,10} \\
+a_{4,1} & a_{4,2} & \ldots & a_{4,10} \\
+a_{5,1} & a_{5,2} & \ldots & a_{5,10} \\
+\end{array} \vphantom{\vbox to 1.5cm{}} \right)}_{\text{free parameters in the fit}} \cdot \underbrace{\left( \begin{array}{c}
+x_1 \\
+x_2 \\
+\vdots \\
+x_{10} \\
+\end{array} \vphantom{\vbox to 1.5cm{}} \right)}_{\text{input values}} + \underbrace{\left( \begin{array}{c}
+b_1 \\
+b_2 \\
+b_3 \\
+b_4 \\
+b_5 \\
+\end{array} \vphantom{\vbox to 1.5cm{}} \right)}_{\text{free parameters}} \mbox{\hspace{0.25 cm}} \right] = \underbrace{\left( \begin{array}{c}
+y_1 \\
+y_2 \\
+y_3 \\
+y_4 \\
+y_5 \\
+\end{array} \vphantom{\vbox to 1.5cm{}} \right)}_{\text{output values}} = \begin{array}{c}
+f[ a_{1,1}x_1 + a_{1,2}x_2 + \ldots a_{1,10}x_{10} + b_1 ] \\
+f[ a_{2,1}x_1 + a_{2,2}x_2 + \ldots a_{2,10}x_{10} + b_2 ] \\
+f[ a_{3,1}x_1 + a_{3,2}x_2 + \ldots a_{3,10}x_{10} + b_3 ] \\
+f[ a_{4,1}x_1 + a_{4,2}x_2 + \ldots a_{4,10}x_{10} + b_4 ] \\
+f[ a_{5,1}x_1 + a_{5,2}x_2 + \ldots a_{5,10}x_{10} + b_5 ] \\
+\end{array} \]
+\end{columns}
+\end{frame}
+
+\begin{frame}{Neural networks take inspiration from neurons in the brain}
+\vspace{0.16 cm}
+\begin{columns}
+\column{1.1\linewidth}
+\includegraphics[width=\linewidth]{img/real-neuron-layers.pdf}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Neural networks take inspiration from neurons in the brain}
+To do the same thing with our model, take the output of one ``activation + linear transform'' and use it as the input to the next:
+
+\vspace{1 cm}
+\begin{columns}
+\column{1.15\linewidth}
+\[ \only<1>{f \left( a^{\text{layer 1}}_{i\mbox{,\,}j} \cdot x_j + b^{\text{layer 1}}_i \right)}\only<2>{f \left( a^{\text{layer 2}}_{i\mbox{,\,}j} \cdot \fbox{$\displaystyle f \left( a^{\text{layer 1}}_{i\mbox{,\,}j} \cdot x_j + b^{\text{layer 1}}_i \right)$} + b^{\text{layer 2}}_i \right)}\only<3>{f \left( a^{\text{layer 3}}_{i\mbox{,\,}j} \cdot \fbox{$\displaystyle f \left( a^{\text{layer 2}}_{i\mbox{,\,}j} \cdot \fbox{$\displaystyle f \left( a^{\text{layer 1}}_{i\mbox{,\,}j} \cdot x_j + b^{\text{layer 1}}_i \right)$} + b^{\text{layer 2}}_i \right) $} + b^{\text{layer 3}}_i \right)}\only<4->{\mbox{\hspace{-1 cm}}f \left( a^{\text{layer 4}}_{i\mbox{,\,}j} \cdot \fbox{$\displaystyle f \left( a^{\text{layer 3}}_{i\mbox{,\,}j} \cdot \fbox{$\displaystyle f \left( a^{\text{layer 2}}_{i\mbox{,\,}j} \cdot \fbox{$\displaystyle f \left( a^{\text{layer 1}}_{i\mbox{,\,}j} \cdot x_j + b^{\text{layer 1}}_i \right)$} + b^{\text{layer 2}}_i \right) $} + b^{\text{layer 3}}_i \right) $} + b^{\text{layer 4}}_i \right)\mbox{\hspace{-1 cm}}} \]
+\end{columns}
+
+\vspace{1 cm}
+\uncover<5>{Without the non-linear activation functions, we'd lose this structure: linear transformations of linear transformations would collapse down to a single linear transformation.}
+
+\end{frame}
+
+\begin{frame}{It's usually drawn like this}
+\vspace{0.25 cm}
+\includegraphics[width=\linewidth]{img/artificial-neural-network-layers.pdf}
+
+\vspace{0.25 cm}
+The lines indicate that every output from one layer is included in the linear transformation of the next layer. (``There's an $a_{i\mbox{,\,}j}$ for every $x_j$ and $y_i$.'')
 \end{frame}
 
 \end{document}
