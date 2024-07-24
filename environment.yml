@@ -1,0 +1,12 @@
+name: 2024-07-24-codas-hep-ml
+
+dependencies:
+  - python=3.11
+  - numpy
+  - iminuit
+  - matplotlib
+  - scikit-learn
+  - pandas
+  - pytorch-cpu
+  - h5py
+  - awkward

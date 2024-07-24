@@ -1,8 +1,0 @@
-numpy
-iminuit
-matplotlib
-scikit-learn
-pandas
-torch==2.4.0+cpu
-h5py
-awkward
