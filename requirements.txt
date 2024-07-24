@@ -3,6 +3,6 @@ iminuit
 matplotlib
 scikit-learn
 pandas
-torch
+torch==2.4.0+cpu
 h5py
 awkward
